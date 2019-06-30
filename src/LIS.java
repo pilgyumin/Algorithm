@@ -7,11 +7,19 @@ public class LIS {
 	private static ArrayList<Integer> tail;
 	
 	private static int lowerbound(int left,int right, int num) {
-		int mid;
+		int low = left;
+		int high = right;
+		int mid = 0;
 		
-		while(left < right) {
-			mid = (left + right) / 2;
-	
+		while(low <= mid) {
+			mid = (low + high) / 2;
+			if(tail.get(mid) < num) {
+				low = mid + 1;
+			}
+			else {
+				high = mid - 1;
+				
+			}
 		}
 		
 		return 0;
