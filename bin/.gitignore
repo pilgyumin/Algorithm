@@ -1,14 +1,3 @@
-/LIS.class
-/LinkedListTest$Linkedlist.class
-/LinkedListTest$Node.class
-/LinkedListTest.class
-/MergeSort.class
-/QuickSort.class
-/SegmentTree.class
-/Solution$1.class
+/Main.class
 /Solution$Node.class
-/Solution.class
-/TrieStringMatcher$TrieNode.class
-/TrieStringMatcher.class
-/tsp.class
-/Hash.class
+/Heap.class

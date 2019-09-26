@@ -1,132 +1,142 @@
 
 import java.io.BufferedReader;
-import java.io.IOException;
+import java.io.BufferedWriter;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.PriorityQueue;
+import java.io.OutputStreamWriter;
 
 
-public class Solution {
-	
-	static class Node {
-		int end;
-		int cost;
+import java.util.Scanner;
 
-		public Node(int end, int cost) {
-			this.end = end;
-			this.cost = cost;
+class Solution {
+    static BufferedReader br;
+    
+    static class Node{
+    	int x;
+    	int y;
+    	
+		public Node(int x, int y) {
+			this.x = x;
+			this.y = y;
 		}
 
 		@Override
 		public String toString() {
-			return "Node [end=" + end + ", cost=" + cost + "]";
+			return "Node [x=" + x + ", y=" + y + "]";
 		}
-
-	}
-	
-	private static int[] dist;
-	private static int[] input;
-	private static int[] map;
-	private static int n;
-	private static int start;
-	private static int end;
-	private static ArrayList<Node>[] ar;
-	private static ArrayList<Node>[] real;
-	private static PriorityQueue<Node> pq;
-	private static int num;
-	
-	private static void dijkstra(int s) {
-		int start = s;
-		
-		dist[start] = 0;
-		Node no = new Node(start, dist[start]);
-		pq.add(no);
-		while (!pq.isEmpty()) {
-			Node n = pq.poll();
-			for (int i = 0; i < real[n.end].size(); i++) {
-				Node nn = real[n.end].get(i);
-				if (dist[n.end] > dist[nn.end] + n.cost) {
-					dist[n.end] = dist[nn.end] + n.cost;
-					pq.add(new Node(n.end, dist[n.end]));
-				}
-			}
-			
-		}
-		for(int j = 1; j <= num; j++) {
-			System.out.print(dist[j] + " ");
-		}
-		System.out.println();
-	}
-
-	public static void main(String[] args) {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		try {
-			int test = Integer.parseInt(br.readLine());
-			for(int i = 1; i <= test; i++) {
-				num = Integer.parseInt(br.readLine());
-				ar = new ArrayList[num+1];
-				real = new ArrayList[num+1];
-				dist = new int[num+1];
-				input = new int[num+1];
-				map = new int[num+1];
-				pq = new PriorityQueue<Node>(new Comparator<Node>() {
-					@Override
-					public int compare(Node arg0, Node arg1) {
-						return arg0.cost - arg1.cost;
-					}
-				});
-				String[] s = br.readLine().split(" ");
-				for(int j = 0; j <= num; j++) {
-					if(j < num) {
-						input[j] = Integer.parseInt(s[j]);
-					}
-					ar[j] = new ArrayList<>();
-					real[j] = new ArrayList<>();
-				}
-//				for(int j = 0; j <= num; j++) {
-//					System.out.print(input[j] + " ");
-//				}
-//				System.out.println();
-				
-				for(int j = 1; j < num; j++) {
-					String[] ss = br.readLine().split(" ");
-					for(int k = 0; k < ss.length; k++) {
-						ar[j].add(new Node(j+k+1,Integer.parseInt(ss[k])));
-						ar[j+k+1].add(new Node(j,Integer.parseInt(ss[k])));
-					}
-				}
-				
-				
-				for(int j = num; j >= 0; j--) {
-					System.out.println(input[j]);
-					for(int k = 0; k < ar[input[j]].size(); k++) {
-						int end = ar[input[j]].get(k).end;
-						int cost = ar[input[j]].get(k).cost;
-						System.out.println(end + " " + cost);
-						real[input[j]].add(new Node(end,cost));
-					}
-					Arrays.fill(dist, 987654321);
-					for(int k = 1; k <= num; k++) {
-						dijkstra(j);
-					}
-				}
-				
-				
-//				for(int j = 1; j <= num; j++) {
-//					for(int k = 0; k < ar[j].size(); k++) {
-//						System.out.print(ar[j].get(k).end + " " + ar[j].get(k).cost + " ");
-//					}
-//					System.out.println();
-//				}
-//				System.out.println();
-			}
-		} catch (NumberFormatException | IOException e) {
-		}
-		
-	}
-
+ 
+    }
+ 
+    static final int MAX_SIZE = 100;
+ 
+    static Node heap[] = new Node[MAX_SIZE];
+    static int heapSize = 0;
+ 
+    static void heapInit()
+    {
+        heapSize = 0;
+    }
+ 
+    static void heapPush(Node value)
+    {
+        if (heapSize + 1 > MAX_SIZE)
+        {
+            return;
+        }
+ 
+        heap[heapSize] = value;
+ 
+        int current = heapSize;
+        while (current > 0 && heap[current].x <= heap[(current - 1) / 2].x) 
+        {
+        	if(heap[current].y < heap[(current - 1) / 2].y) 
+        	{
+        		Node temp = heap[(current - 1) / 2];
+                heap[(current - 1) / 2] = heap[current];
+                heap[current] = temp;
+               
+        	}
+        	current = (current - 1) / 2;
+        }
+ 
+        heapSize = heapSize + 1;
+    }
+ 
+    static Node heapPop()
+    {
+        if (heapSize <= 0)
+        {
+            return null;
+        }
+ 
+        Node value = heap[0];
+        heapSize = heapSize - 1;
+ 
+        heap[0] = heap[heapSize];
+ 
+        int current = 0;
+        while (current < heapSize && current * 2 + 1 < heapSize)
+        {
+            Node child;
+//            if (current * 2 + 2 >= heapSize)
+//            {
+//                child = heap[current * 2 + 1];
+//            }
+//            else
+//            {
+//                child = heap[current * 2 + 1] < heap[current * 2 + 2] ? heap[current * 2 + 1] : heap[current * 2 + 2];
+//            }
+// 
+//            if (heap[current] < heap[child])
+//            {
+//                break;
+//            }
+// 
+//            int temp = heap[current];
+//            heap[current] = heap[child];
+//            heap[child] = temp;
+// 
+//            current = child;
+        }
+        return value;
+    }
+ 
+    static void heapPrint(Node[] heap, int heap_size)
+    {
+        for (int i = 0; i < heap_size; i++)
+        {
+            System.out.print(heap[i] + " ");
+        }
+        System.out.println();
+    }
+ 
+ 
+    public static void main(String arg[]) throws Exception {
+        br = new BufferedReader(new InputStreamReader(System.in));
+         
+        int T = Integer.parseInt(br.readLine());
+ 
+        for (int test_case = 1; test_case <= T; test_case++)
+        {
+            int N = Integer.parseInt(br.readLine());
+             
+            heapInit();
+             
+            for (int i = 0; i < N; i++)
+            {
+                String[] s = br.readLine().split(" ");
+                int a = Integer.parseInt(s[0]);
+                int b = Integer.parseInt(s[1]);
+                heapPush(new Node(a,b));
+            }
+ 
+            System.out.print("#" + test_case + " ");            
+            for (int i = 0; i < N; i++)
+            {
+                System.out.print(heapPop() + " ");
+            }
+            System.out.println();
+        }
+    }
 }
 
 

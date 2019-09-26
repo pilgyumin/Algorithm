@@ -9,13 +9,14 @@ public class Hash {
 	int my_find[] = new int[30000];
 	int stl_find[] = new int[30000];
 	
+	
 	static int remove = 1;
 	static int find = 2;
 	
-	static int PN = 23;
-	static int HASH_SIZE = 10000; // ÇØ½¬ »çÀÌÁî´Â 1/3 Á¤µµ·Î ÀâÀ½
+	static int PN = 31;
+	static int HASH_SIZE = 10000; // ï¿½Ø½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 1/3 ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	
-	static int name_size;
+	static int name_size;	
 	static char[][] name = new char[30000][100];
 	static int[][] table = new int[HASH_SIZE][30];
 
@@ -37,74 +38,84 @@ public class Hash {
 	}
 	
 	static int get_key(char[] data) {
-		int p = 1, key = 0, len = data.length;
-		for(int i = 0 ; i < len; ++i) {
-			key += (data[i] * p);
-			p *= PN;
+		int key = 0, len = data.length, p = 1;
+		
+		for(int i = 0; i < len; i++) {
+			key += (p * data[i]);
+			p *= PN;	
 		}
 		
-		if(key < 0) key *= -1;
-		
-		return (key % HASH_SIZE);
+		if(key < 0) {
+			key *= -1;
+		}
+		return key % HASH_SIZE;
 	}
 	
 	static boolean strcmp(char[] a, char[] b) {
-		int alen = a.length;
-		int blen = b.length;
-		if(alen != blen) {
+		
+		if(a.length != b.length) {
 			return false;
 		}
-
-		for(int i = 0; i < alen; i++) {
+		
+		int len = a.length < b.length ? a.length : b.length;
+		
+		for(int i = 0; i < len ; i++) {
 			if(a[i] != b[i]) {
 				return false;
 			}
 		}
+		
 		return true;
 	}
 	
 	static int contain(char[] data) {
 		int key = get_key(data);
-		int tsize = table[key][0];
-		for(int i = 1; i <= tsize; i++) {
-			int idx = table[key][i];
-			if(strcmp(data, name[idx])) {
-				return idx;
+		int size = table[key][0];
+		
+		for(int i = 1; i <= size; i++) {
+			if(strcmp(name[table[key][i]],data)) {
+				return table[key][i];
 			}
 		}
+		
 		return -1;
 	}
 	
 	static void add(char[] data) {
 		int key = get_key(data);
-		int len = data.length;
+		int size = table[key][0];
 		
-		for(int i = 0 ; i< len; i++) {
+		for(int i = 0; i < data.length; i++) {
 			name[name_size][i] = data[i];
 		}
 		
-		table[key][++table[key][0]] = HASH_SIZE;
-		++name_size; 
+		table[key][++table[key][0]] = name_size;
+		
+		name_size++;
 	}
 	
-	static boolean remove(char[] data) {
+	static boolean remove(char data[]) {
 		int key = get_key(data);
-		int tsize = table[key][0];
-		
-		for(int i = 1; i <= tsize; i++ ) {
-			int idx = table[key][i];
-			if(strcmp(data, name[idx])) {
-				for(int j = i+1; j <= tsize; j++) {
+		int size = table[key][0];
+		for(int i = 1; i <= size; i++) {
+			if(strcmp(name[table[key][i]],data)) {
+				for(int j = i+1; j <= size; j++) {
 					table[key][j-1] = table[key][j];
 				}
-				
-				--table[key][0];
-
+				table[key][0]--;
 				return true;
 			}
 		}
+		
 		return false;
 	}
+	
+	
+	
+	
+	
+	
+	
 	
 	
 //	static int get_key(char _name[]) {
